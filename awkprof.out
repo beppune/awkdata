@@ -1,0 +1,22 @@
+/Event/
+
+/Result/ {
+	split($0, a, "-")
+	res = substr(a[1], length(a[1]), 1)
+	switch(res){
+		case 1:
+			b++;
+			break;
+		case 0:
+			w++;
+			break;
+		case 2:
+			d++;
+			break;
+	}
+}
+
+END {
+	print "Whites: ", w, ". Blacks :", b, ". Draws: ", d
+}
+

@@ -1,0 +1,20 @@
+[Event "Rated Blitz game"]
+[Site "https://lichess.org/6LypoDqZ"]
+[Date "2019.04.30"]
+[Round "-"]
+[White "bogdanconstantin"]
+[Black "mfl2013"]
+[Result "1-0"]
+[UTCDate "2019.04.30"]
+[UTCTime "22:00:29"]
+[WhiteElo "1985"]
+[BlackElo "1893"]
+[WhiteRatingDiff "+8"]
+[BlackRatingDiff "-8"]
+[ECO "A50"]
+[Opening "Slav Indian"]
+[TimeControl "180+2"]
+[Termination "Time forfeit"]
+
+1. d4 { [%clk 0:03:00] } Nf6 { [%clk 0:03:00] } 2. c4 { [%clk 0:03:01] } c6 { [%clk 0:02:59] } 3. Nc3 { [%clk 0:03:03] } d5 { [%clk 0:02:59] } 4. cxd5 { [%clk 0:03:05] } cxd5 { [%clk 0:03:00] } 5. Bg5 { [%clk 0:03:06] } e6 { [%clk 0:02:59] } 6. Bxf6 { [%clk 0:03:06] } Qxf6 { [%clk 0:02:59] } 7. e3 { [%clk 0:03:08] } Nc6 { [%clk 0:03:00] } 8. Bb5 { [%clk 0:03:07] } Bd7 { [%clk 0:03:00] } 9. Nf3 { [%clk 0:03:08] } Bd6 { [%clk 0:03:00] } 10. Qe2 { [%clk 0:03:05] } O-O { [%clk 0:03:01] } 11. O-O { [%clk 0:03:05] } a6 { [%clk 0:02:59] } 12. Bxc6 { [%clk 0:03:06] } Bxc6 { [%clk 0:02:59] } 13. a4 { [%clk 0:03:06] } Qh6 { [%clk 0:02:57] } 14. g3 { [%clk 0:03:06] } g5 { [%clk 0:02:55] } 15. Ne5 { [%clk 0:03:05] } Bxe5 { [%clk 0:02:55] } 16. dxe5 { [%clk 0:03:07] } f5 { [%clk 0:02:54] } 17. exf6 { [%clk 0:03:07] } Qxf6 { [%clk 0:02:53] } 18. Qg4 { [%clk 0:03:03] } Rf7 { [%clk 0:02:36] } 19. Rac1 { [%clk 0:02:59] } Raf8 { [%clk 0:02:36] } 20. b4 { [%clk 0:02:53] } d4 { [%clk 0:02:35] } 21. exd4 { [%clk 0:02:51] } Bf3 { [%clk 0:02:36] } 22. Qh3 { [%clk 0:02:40] } h5 { [%clk 0:02:19] } 23. b5 { [%clk 0:02:24] } Rh7 { [%clk 0:02:17] } 24. bxa6 { [%clk 0:02:12] } bxa6 { [%clk 0:02:18] } 25. Rfe1 { [%clk 0:02:05] } Bd5 { [%clk 0:02:06] } 26. Qf1 { [%clk 0:01:45] } 1-0
+
