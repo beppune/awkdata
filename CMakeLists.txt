@@ -5,6 +5,6 @@ project(awkpipe)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-add_executable(awkpipe main.cpp)
+add_executable(awkpipe main.cpp sqlite3/sqlite3.c)
 
 
