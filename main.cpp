@@ -6,6 +6,10 @@
 
 #include "cxxopts.hpp"
 
+extern "C" {
+	#include "sqlite3/sqlite3.h"
+}
+
 struct config {
     std::string createscript;
     std::string output;
@@ -18,10 +22,6 @@ void acc_resut(const std::string &s, count_t &w, count_t &b, count_t &d, count_t
 void parse_options(config &conf, int argc, char *argv[]);
 
 int main(int argc, char *argv[]) {
-
-	bool is_verbose = false;
-
-	parse_options(is_verbose, argc, argv);
 
 	size_t done = 0;
 
@@ -86,7 +86,7 @@ void acc_resut(const std::string &s, count_t &w, count_t &b, count_t &d, count_t
 void parse_options(config &conf, int argc, char *argv[]) {
 	cxxopts::Options opts("","");
 	opts.add_options()
-		("c,create-script, "Database creation script in case of new dump file", cxxopts::value<std::string>()->default_value("ddl.sql"))
+		("c,create-script", "Database creation script in case of new dump file", cxxopts::value<std::string>()->default_value("ddl.sql"))
         ("output", "Database file to dump data. If new requires option --create-script", cxxopts::value<std::string>()->default_value("pgn.dump"));
 
 	auto res = opts.parse(argc, argv);
