@@ -15,25 +15,19 @@ struct config {
     std::string output;
 };
 
-struct sqlite3_deleter {
-
-    void operator()(sqlite3 *db) const {
-        sqlite3_close(db);
-        db = nullptr;
-    }
+void sqlite3_deleter(sqlite3 *db) {
+    sqlite3_close(db);
+    db = nullptr;
 };
 
-struct stmt_finalizer {
-
-    void operator()(sqlite3_stmt *p) {
-        sqlite3_finalize(p);
-        p = nullptr;
-    }
+void stmt_finalizer(sqlite3_stmt *p) {
+    sqlite3_finalize(p);
+    p = nullptr;
 };
 
 using count_t = unsigned long;
-using sqlite_ptr = std::unique_ptr<sqlite3, sqlite3_deleter>;
-using stmt_ptr = std::unique_ptr<sqlite3_stmt, stmt_finalizer>;
+using sqlite_ptr = std::unique_ptr<sqlite3, void(&)(sqlite3 *)>;
+using stmt_ptr = std::unique_ptr<sqlite3_stmt, void(&)(sqlite3_stmt*)>;
 
 #define RESULT_WHITE 1
 #define RESULT_BLACK 2
@@ -55,6 +49,8 @@ void parse_options(config &conf, int argc, char *argv[]);
 sqlite_ptr open_db(const std::string &c);
 
 stmt_ptr prepare_st(sqlite_ptr &sq, const char *SQL);
+
+void exec_st(stmt_ptr &st, int data);
 
 void dump_result(sqlite_ptr &db, int result);
 
@@ -87,19 +83,10 @@ int main(int argc, char *argv[]) {
         std::getline(*inputfile, s0);
         result = acc_resut(s0, white, black, draw, games, stars);		
         if( result == 100 ) continue;
+
+        exec_st(stmt, result);
+
         done += s0.size() + 1;
-        result = sqlite3_bind_int( stmt.get(), 1, result);
-        if( result != SQLITE_OK ) {
-            std::cerr << "BIND: " << sqlite3_errstr(result) << "\n";
-            exit(1);
-        }
-        result = sqlite3_step( stmt.get() );
-        if( result != SQLITE_DONE ) {
-            std::cerr << "STEP: " << sqlite3_errstr(result) << "\n";
-            exit(1);
-        }
-        sqlite3_reset(stmt.get());
-        sqlite3_clear_bindings(stmt.get());
     } while( inputfile->good() );
 
     if( inputfile->bad() ) {
@@ -161,16 +148,16 @@ sqlite_ptr open_db(const std::string &c) {
     int res = sqlite3_open_v2(c.c_str(), &db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr);
     if( res != SQLITE_OK ) {
         std::cerr << sqlite3_errstr(res) << "\n";
-        return nullptr;
+        return sqlite_ptr(nullptr, sqlite3_deleter);
     }
 
     res = sqlite3_exec(db, CREATE_DDL, nullptr, nullptr, nullptr);
     if( res != SQLITE_OK ) {
         std::cerr << sqlite3_errstr(res) << "\n";
-        return nullptr;
+        return sqlite_ptr(nullptr, sqlite3_deleter);
     }
 
-    return sqlite_ptr(db);
+    return sqlite_ptr(db, sqlite3_deleter);
 
 }
 
@@ -183,7 +170,22 @@ stmt_ptr prepare_st(sqlite_ptr &db, const char *SQL) {
         exit(2);
     }
 
-    return stmt_ptr(stmt);
-    
+    return stmt_ptr(stmt, stmt_finalizer);
+
+}
+
+void exec_st(stmt_ptr &stmt, int data) {
+    int result = sqlite3_bind_int( stmt.get(), 1, data);
+    if( result != SQLITE_OK ) {
+        std::cerr << "BIND: " << sqlite3_errstr(data) << "\n";
+        exit(1);
+    }
+    result = sqlite3_step( stmt.get() );
+    if( result != SQLITE_DONE ) {
+        std::cerr << "STEP: " << sqlite3_errstr(data) << "\n";
+        exit(1);
+    }
+    sqlite3_reset(stmt.get());
+    //sqlite3_clear_bindings(stmt.get());
 }
 
