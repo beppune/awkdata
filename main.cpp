@@ -24,14 +24,14 @@ struct sqlite3_deleter {
 
 using count_t = unsigned long;
 using sqlite_ptr = std::unique_ptr<sqlite3,sqlite3_deleter>;
-#define RESULT_WHITE 119
-#define RESULT_BLACK 98
-#define RESULT_DRAW  100
+#define RESULT_WHITE 1
+#define RESULT_BLACK 2
+#define RESULT_DRAW  0
 
 const char * const CREATE_DDL =
     "CREATE TABLE games("
         "id     INTEGER PRIMARY KEY AUTOINCREMENT,"
-        "result CHAR(1) NOT NULL"
+        "result INT NOT NULL"
     ");";
 
 const char * const INSERT_DML = 
