@@ -36,7 +36,7 @@ using stmt_ptr = std::unique_ptr<sqlite3_stmt, void(&)(sqlite3_stmt*)>;
 const char * const CREATE_DDL =
 "CREATE TABLE games("
 "id     INTEGER PRIMARY KEY AUTOINCREMENT,"
-"result INT NOT NULL"
+"result TEXT NOT NULL"
 ");";
 
 const char * const INSERT_DML = 
@@ -175,7 +175,22 @@ stmt_ptr prepare_st(sqlite_ptr &db, const char *SQL) {
 }
 
 void exec_st(stmt_ptr &stmt, int data) {
-    int result = sqlite3_bind_int( stmt.get(), 1, data);
+
+    int result = -1;
+    switch(data) {
+        case RESULT_WHITE:
+            result = sqlite3_bind_text( stmt.get(), 1, "W", -1, SQLITE_STATIC);
+            break;
+
+        case RESULT_BLACK:
+            result = sqlite3_bind_text( stmt.get(), 1, "B", -1, SQLITE_STATIC);
+            break;
+        
+        case RESULT_DRAW:
+            result = sqlite3_bind_text( stmt.get(), 1, "D", -1, SQLITE_STATIC);
+            break;
+    }
+
     if( result != SQLITE_OK ) {
         std::cerr << "BIND: " << sqlite3_errstr(data) << "\n";
         exit(1);
@@ -186,6 +201,5 @@ void exec_st(stmt_ptr &stmt, int data) {
         exit(1);
     }
     sqlite3_reset(stmt.get());
-    //sqlite3_clear_bindings(stmt.get());
 }
 
