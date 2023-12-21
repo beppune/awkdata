@@ -1,2 +1,6 @@
 *.pgn.zst
 build/
+*.dump
+*.db
+*.sqlite
+*.sqlite3

@@ -76,6 +76,7 @@ int main(int argc, char *argv[]) {
 	do{
 		std::getline(*inputfile, s0);
 		result = acc_resut(s0, white, black, draw, games, stars);		
+        if( result == 100 ) continue;
 		done += s0.size() + 1;
         result = sqlite3_bind_int( stmt, 1, result);
         if( result != SQLITE_OK ) {
@@ -133,7 +134,7 @@ int acc_resut(const std::string &s, count_t &w, count_t &b, count_t &d, count_t 
 		}
 
 	}
-    return 0;
+    return 100;
 }
 
 void parse_options(config &conf, int argc, char *argv[]) {
