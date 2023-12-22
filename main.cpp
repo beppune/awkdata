@@ -10,6 +10,12 @@ extern "C" {
 #include "sqlite3/sqlite3.h"
 }
 
+#include <thread>
+
+#include "ts_queue.hpp"
+
+#include <utility>
+
 struct config {
     std::string createscript;
     std::string output;
@@ -28,6 +34,7 @@ void stmt_finalizer(sqlite3_stmt *p) {
 using count_t = unsigned long;
 using sqlite_ptr = std::unique_ptr<sqlite3, void(&)(sqlite3 *)>;
 using stmt_ptr = std::unique_ptr<sqlite3_stmt, void(&)(sqlite3_stmt*)>;
+using pack = std::pair<std::string,int>;
 
 #define RESULT_WHITE 1
 #define RESULT_BLACK 2
@@ -69,6 +76,8 @@ int main(int argc, char *argv[]) {
         exit(2);
     }
 
+    ts_queue<pack> queue;
+
     auto stmt = prepare_st(db, INSERT_DML);
 
     size_t done = 0;
@@ -83,16 +92,28 @@ int main(int argc, char *argv[]) {
     int result;
     std::string event = "test";
 
+    std::thread dumpst([&stmt, &queue](){
+            while(true) {
+                auto p = queue.pop();
+                if( std::get<0>(*p) == "" ) return;
+                exec_st(stmt, std::get<0>(*p), std::get<1>(*p));
+            }
+    });
+
     do{
         std::getline(*inputfile, s0);
+
         if( set_event(s0, event) ) continue;
         result = acc_resut(s0, white, black, draw, games, stars);		
         if( result == 100 ) continue;
 
-        exec_st(stmt, event, result);
+        queue.push({event, result});
 
         done += s0.size() + 1;
     } while( inputfile->good() );
+
+    queue.push({"", 1});
+    dumpst.join();
 
     if( inputfile->bad() ) {
         std::cerr << "Input file critical error" << std::endl;
