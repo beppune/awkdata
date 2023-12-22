@@ -36,16 +36,13 @@ using stmt_ptr = std::unique_ptr<sqlite3_stmt, void(&)(sqlite3_stmt*)>;
 const char * const CREATE_DDL =
 "CREATE TABLE games("
 "id     INTEGER PRIMARY KEY AUTOINCREMENT,"
-"event  TEST NOT NULL,"
 "result TEXT NOT NULL"
 ");";
 
 const char * const INSERT_DML = 
-"INSERT INTO games(event,result) VALUES(?,?);";
+"INSERT INTO games(result) VALUES(?);";
 
 int acc_resut(const std::string &s, count_t &w, count_t &b, count_t &d, count_t &g, count_t &t);
-
-bool set_event(const std::string &s, std::string &e);
 
 void parse_options(config &conf, int argc, char *argv[]);
 
@@ -53,7 +50,7 @@ sqlite_ptr open_db(const std::string &c);
 
 stmt_ptr prepare_st(sqlite_ptr &sq, const char *SQL);
 
-void exec_st(stmt_ptr &st, const std::string &event,  int data);
+void exec_st(stmt_ptr &st, int data);
 
 void dump_result(sqlite_ptr &db, int result);
 
@@ -81,15 +78,13 @@ int main(int argc, char *argv[]) {
     white = black = draw = games = stars = 0;
 
     int result;
-    std::string event = "test";
 
     do{
         std::getline(*inputfile, s0);
-        if( set_event(s0, event) ) continue;
         result = acc_resut(s0, white, black, draw, games, stars);		
         if( result == 100 ) continue;
 
-        exec_st(stmt, event, result);
+        exec_st(stmt, result);
 
         done += s0.size() + 1;
     } while( inputfile->good() );
@@ -110,16 +105,6 @@ int main(int argc, char *argv[]) {
     }
 
     return 0;
-}
-
-bool set_event(const std::string &s, std::string &e) {
-    if( s.starts_with("[Event") ) {
-        e.erase();
-        int i = s.find_last_of("\"");
-        e = s.substr(8, i-8);
-        return true;
-    }
-    return false; //continue?
 }
 
 int acc_resut(const std::string &s, count_t &w, count_t &b, count_t &d, count_t &g, count_t &t) {
@@ -189,39 +174,30 @@ stmt_ptr prepare_st(sqlite_ptr &db, const char *SQL) {
 
 }
 
-void exec_st(stmt_ptr &stmt, const std::string &e, int data) {
+void exec_st(stmt_ptr &stmt, int data) {
 
-    int result = SQLITE_OK;
-
-    result = sqlite3_bind_text( stmt.get(), 1, e.c_str(), e.size(), SQLITE_STATIC);
-    if( result != SQLITE_OK ) {
-        std::cerr << "BIND: " << sqlite3_errstr(result) << "\n";
-        exit(1);
-    }
-
+    int result = -1;
     switch(data) {
         case RESULT_WHITE:
-            result = sqlite3_bind_text( stmt.get(), 2, "W", -1, SQLITE_STATIC);
+            result = sqlite3_bind_text( stmt.get(), 1, "W", -1, SQLITE_STATIC);
             break;
 
         case RESULT_BLACK:
-            result = sqlite3_bind_text( stmt.get(), 2, "B", -1, SQLITE_STATIC);
+            result = sqlite3_bind_text( stmt.get(), 1, "B", -1, SQLITE_STATIC);
             break;
         
         case RESULT_DRAW:
-            result = sqlite3_bind_text( stmt.get(), 2, "D", -1, SQLITE_STATIC);
+            result = sqlite3_bind_text( stmt.get(), 1, "D", -1, SQLITE_STATIC);
             break;
     }
 
     if( result != SQLITE_OK ) {
-        std::cerr << "BIND: " << sqlite3_errstr(result) << "\n";
+        std::cerr << "BIND: " << sqlite3_errstr(data) << "\n";
         exit(1);
     }
-
-
     result = sqlite3_step( stmt.get() );
     if( result != SQLITE_DONE ) {
-        std::cerr << "STEP: " << sqlite3_errstr(result) << "\n";
+        std::cerr << "STEP: " << sqlite3_errstr(data) << "\n";
         exit(1);
     }
     sqlite3_reset(stmt.get());
